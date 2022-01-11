@@ -12,15 +12,15 @@ app.get('*',async (req,res)=>{
     let found=await await database.db("main").collection("redirects").findOne({from:req.path.replace("/","")})
     if(found){
         if(found.options.limit){
-            if(found.options.limit.left>1){
-                res.redirect(found.to)
-                await database.db("main").collection("redirects").updateOne({from:req.path.replace("/","")},{$inc:{"options.limit.left":-1}})
+            if(found.options.limit>1){
+                redirect()
+                await database.db("main").collection("redirects").updateOne({from:req.path.replace("/","")},{$inc:{"options.limit":-1}})
             }else{
-                res.redirect(found.to)
+                redirect()
                 await database.db("main").collection("redirects").deleteOne({from:found.from})
             }
         }else{
-            res.redirect(found.to)
+            redirect()
         }
         if(found.options.count){
             await database.db("main").collection("redirects").updateOne({from:found.from},{$inc:{"options.count":1}})
