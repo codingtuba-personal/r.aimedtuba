@@ -1,30 +1,31 @@
+global.TextEncoder = require("util").TextEncoder;
+global.TextDecoder = require("util").TextDecoder;
+
 const express = require('express');
 const app = express();
 const { MongoClient } = require('mongodb');
-const secure = require('tuba-secure');
+const secure = require('')
 
 let database=new MongoClient(secure.main.mongodb.url);
-database.connect()
-
-app.listen(2000)
+database.connect().then(()=>app.listen())
 
 app.get('*',async (req,res)=>{
     try{
-        let found=await await database.db("main").collection("redirects").findOne({from:req.path.replace("/","")})
+        let found=await await database.db("main").collection("redirect").findOne({from:req.path.replace("/","")})
         if(found){
             if(found.options.limit){
                 if(found.options.limit>1){
                     redirect()
-                    await database.db("main").collection("redirects").updateOne({from:req.path.replace("/","")},{$inc:{"options.limit":-1}})
+                    await database.db("main").collection("redirect").updateOne({from:req.path.replace("/","")},{$inc:{"options.limit":-1}})
                 }else{
                     redirect()
-                    await database.db("main").collection("redirects").deleteOne({from:found.from})
+                    await database.db("main").collection("redirect").deleteOne({from:found.from})
                 }
             }else{
                 redirect()
             }
             if(found.options.count){
-                await database.db("main").collection("redirects").updateOne({from:found.from},{$inc:{"options.count":1}})
+                await database.db("main").collection("redirect").updateOne({from:found.from},{$inc:{"options.count":1}})
             }
             function redirect(){
                 if(found.options.consent){
@@ -33,8 +34,6 @@ app.get('*',async (req,res)=>{
                     )
                 }else{res.redirect(found.to)}
             }
-        }else{res.send(`<button onclick="window.close()">url doesn't exist, sorry (close)</button>`)}
-    }catch(e){
-        res.send(`<button onclick="window.close()">hello hacker man (close)</button>`)
-    }
+        }else{res.send(`<button>url doesn't exist, sorry</button>`)}
+    }catch(e){res.send(`<button>hello hacker man</button>`)}
 })
