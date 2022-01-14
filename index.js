@@ -4,16 +4,16 @@ global.TextDecoder = require("util").TextDecoder;
 const express = require('express');
 const app = express();
 const { MongoClient } = require('mongodb');
-const secure = require('')
+const secure = require('tuba-secure');
 
 let database=new MongoClient(secure.main.mongodb.url);
-database.connect().then(()=>app.listen())
+database.connect().then(()=>app.listen(2000))
 
 app.get('*',async (req,res)=>{
     try{
         let found=await database.db("main").collection("redirect").findOne({from:req.path.replace("/","")})
         if(found){
-            if(found.options.limit){
+            if(found.options.limit||found.options.limit==0){
                 if(found.options.limit>1){
                     redirect()
                     await database.db("main").collection("redirect").updateOne({from:req.path.replace("/","")},{$inc:{"options.limit":-1}})
@@ -24,7 +24,7 @@ app.get('*',async (req,res)=>{
             }else{
                 redirect()
             }
-            if(found.options.count){
+            if(found.options.count||found.options.count==0){
                 await database.db("main").collection("redirect").updateOne({from:req.path.replace("/","")},{$inc:{"options.count":1}})
             }
             function redirect(){
