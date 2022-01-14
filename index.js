@@ -13,8 +13,8 @@ app.get('*',async (req,res)=>{
     try{
         let found=await database.db("main").collection("redirect").findOne({from:req.path.replace("/","")})
         if(found){
-            if(found.options.limit||found.options.limit==0){
-                if(found.options.limit>1){
+            if(found.options.left||found.options.left==0){
+                if(found.options.left>1){
                     redirect()
                     await database.db("main").collection("redirect").updateOne({from:req.path.replace("/","")},{$inc:{"options.limit":-1}})
                 }else{
